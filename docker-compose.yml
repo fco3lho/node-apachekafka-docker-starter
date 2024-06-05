@@ -7,6 +7,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - kafka-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -22,6 +24,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
 
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
@@ -34,3 +38,25 @@ services:
       KAFKA_BROKERCONNECT: kafka:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
     command: ["--message.format", "json"]
+    networks:
+      - kafka-network
+  
+  node-app:
+    image: node:latest
+    container_name: node-app
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      - kafka
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      - KAFKAJS_NO_PARTITIONER_WARNING=1
+    networks:
+      - kafka-network
+
+networks:
+  kafka-network:
+    driver: bridge
