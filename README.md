@@ -15,6 +15,11 @@ $ cd node-apachekafka-docker-starter
 # Setup
 $ docker-compose up -d
 
+# To send messages to the thread, type the following command in your terminal
+$ curl -X POST http://localhost:3000/produce -H "Content-Type: application/json" -d '{"message":"Hello world, Kafka!"}'
+
 # Open the topic with name is "topic" and see the messages
 $ open http://localhost:9000/topic/topic
 ```
+
+For
